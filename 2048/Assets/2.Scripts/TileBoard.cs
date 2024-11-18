@@ -110,7 +110,7 @@ public class TileBoard : MonoBehaviour
 
     private bool CanMerge(Tile a, Tile b)
     {
-        return a.number == b.number;
+        return a.number == b.number && !b.locked;
     }
 
     private void Merge(Tile a, Tile b)
@@ -144,6 +144,11 @@ public class TileBoard : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
 
         waiting = false;
+
+        foreach (var tile in tiles)
+        {
+            tile.locked = false;
+        }
 
         if (tiles.Count != grid.size)
         {
