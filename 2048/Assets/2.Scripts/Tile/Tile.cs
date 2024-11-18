@@ -5,14 +5,11 @@ using UnityEngine.UI;
 
 public class Tile : MonoBehaviour
 {
-    // 
     public TileState state { get; private set; }    // 타일의 시각적 상태
     public TileCell cell { get; private set; }      // 타일이 위치한 셀
     public int number { get; private set; }         // 타일의 숫자
-
     public bool locked { get; set; }                // 한번의 입력에 여러개의 merge가 생기지 않게
 
-    // 
     private Image background;                       // 배경이미지
     private TextMeshProUGUI text;                   // 타일 숫자를 표시하는 텍스트
 

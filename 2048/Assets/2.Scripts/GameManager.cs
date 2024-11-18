@@ -1,11 +1,16 @@
 using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public TileBoard board;
-    public CanvasGroup gameOver;
+    public TileBoard board;                     // 게임 보드
+    public CanvasGroup gameOver;                // 게임 오버에 쓰이는 CanvasGroup
+
+    public TextMeshProUGUI scoreText;           // 현재 점수 Text UI
+    public TextMeshProUGUI highScoreText;       // 최고 점수 Text UI
+
+    private int score;                          // 현재 점수
 
     private void Start()
     {
@@ -14,6 +19,9 @@ public class GameManager : MonoBehaviour
 
     public void NewGame()
     {
+        SetScore(0);
+        highScoreText.text = LoadHighScore().ToString();
+
         gameOver.alpha = 0f;
         gameOver.interactable = false;
 
@@ -31,6 +39,7 @@ public class GameManager : MonoBehaviour
         StartCoroutine(Fade(gameOver, 1f, 1f));
     }
 
+    // 게임오버 화면 전환 기능 코루틴 (Fade 효과)
     private IEnumerator Fade(CanvasGroup canvasGroup, float to, float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -47,6 +56,34 @@ public class GameManager : MonoBehaviour
         }
 
         canvasGroup.alpha = to;
+    }
+
+    public void AddScore(int points)
+    {
+        SetScore(score + points);
+    }
+
+    private void SetScore(int score)
+    {
+        this.score = score;
+        scoreText.text = score.ToString();
+
+        SaveHighScore();
+    }
+
+    private void SaveHighScore()
+    {
+        int highScore = LoadHighScore();
+
+        if (score > highScore)
+        {
+            PlayerPrefs.SetInt("highScore", score);
+        }
+    }
+
+    private int LoadHighScore()
+    {
+        return PlayerPrefs.GetInt("highScore", 0);
     }
 
     public void EndGame()

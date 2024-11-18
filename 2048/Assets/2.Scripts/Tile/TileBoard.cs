@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TileBoard : MonoBehaviour
 {
-    public GameManager gameManager;
+    public GameManager gameManager;     // gameManager
 
     public Tile tilePrefabs;            // 생성한 타일 프리펩
     public TileState[] tileStates;      // 타일 상태 배열
@@ -12,7 +12,7 @@ public class TileBoard : MonoBehaviour
     private TileGrid grid;              // 그리드
     private List<Tile> tiles;           // 현재 존재하는 타일 목록
 
-    private bool waiting;
+    private bool waiting;               // Merge 애니메이션 확인 bool
 
     private void Awake()
     {
@@ -66,6 +66,7 @@ public class TileBoard : MonoBehaviour
         }
     }
 
+    // 모든 타일 이동
     private void MoveTiles(Vector2Int direction, int startX, int incrementX, int startY, int incrementY)
     {
         bool changed = false;
@@ -89,6 +90,7 @@ public class TileBoard : MonoBehaviour
         }
     }
 
+    // 단일 타일 이동
     private bool MoveTile(Tile tile, Vector2Int direction)
     {
         TileCell newCell = null;
@@ -133,6 +135,8 @@ public class TileBoard : MonoBehaviour
         int number = b.number * 2;
 
         b.SetState(tileStates[index], number);
+
+        gameManager.AddScore(number);
     }
 
     private int IndexOf(TileState state)
