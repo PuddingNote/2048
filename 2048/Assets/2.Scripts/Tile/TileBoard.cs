@@ -20,29 +20,6 @@ public class TileBoard : MonoBehaviour
         tiles = new List<Tile>(16);
     }
 
-    public void ClearBoard()
-    {
-        foreach (var cell in grid.cells)
-        {
-            cell.tile = null;
-        }
-
-        foreach (var tile in tiles)
-        {
-            Destroy(tile.gameObject);
-        }
-
-        tiles.Clear();
-    }
-
-    public void CreateTile()
-    {
-        Tile tile = Instantiate(tilePrefabs, grid.transform);
-        tile.SetState(tileStates[0], 2);
-        tile.Spawn(grid.GetRandomEmptyCell());
-        tiles.Add(tile);
-    }
-
     private void Update()
     {
         if (!waiting)
@@ -66,6 +43,29 @@ public class TileBoard : MonoBehaviour
         }
     }
 
+    public void ClearBoard()
+    {
+        foreach (var cell in grid.cells)
+        {
+            cell.tile = null;
+        }
+
+        foreach (var tile in tiles)
+        {
+            Destroy(tile.gameObject);
+        }
+
+        tiles.Clear();
+    }
+
+    public void CreateTile()
+    {
+        Tile tile = Instantiate(tilePrefabs, grid.transform);
+        tile.SetState(tileStates[0], 2);
+        tile.Spawn(grid.GetRandomEmptyCell());
+        tiles.Add(tile);
+    }
+
     // 모든 타일 이동
     private void MoveTiles(Vector2Int direction, int startX, int incrementX, int startY, int incrementY)
     {
@@ -77,7 +77,7 @@ public class TileBoard : MonoBehaviour
             {
                 TileCell cell = grid.GetCell(x, y);
 
-                if (cell.occupied)
+                if (!cell.empty)
                 {
                     changed |= MoveTile(cell.tile, direction);
                 }
@@ -98,7 +98,7 @@ public class TileBoard : MonoBehaviour
 
         while (adjacent != null)
         {
-            if (adjacent.occupied)
+            if (!adjacent.empty)
             {
                 if (CanMerge(tile, adjacent.tile))
                 {

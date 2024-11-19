@@ -1,6 +1,6 @@
 using System.Collections;
-using TMPro;
 using UnityEngine;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
 
     public TextMeshProUGUI scoreText;           // 현재 점수 Text UI
     public TextMeshProUGUI highScoreText;       // 최고 점수 Text UI
+    public TextMeshProUGUI scorePopupPrefab;    // 점수 팝업 UI 프리팹
 
     private int score;                          // 현재 점수
 
@@ -60,7 +61,43 @@ public class GameManager : MonoBehaviour
 
     public void AddScore(int points)
     {
+        ShowScorePopup(points);
+
         SetScore(score + points);
+    }
+
+    private void ShowScorePopup(int points)
+    {
+        TextMeshProUGUI popup = Instantiate(scorePopupPrefab, scoreText.transform.parent);
+        popup.text = $"+{points}";
+
+        popup.rectTransform.position = scoreText.rectTransform.position;
+
+        StartCoroutine(AnimateScorePopup(popup));
+    }
+
+    private IEnumerator AnimateScorePopup(TextMeshProUGUI popup)
+    {
+        float duration = 1f;
+        float elapsed = 0f;
+
+        Vector3 startPosition = popup.rectTransform.anchoredPosition;
+        Vector3 endPosition = startPosition + new Vector3(0, 50, 0);
+
+        Color startColor = popup.color;
+        Color endColor = new Color(startColor.r, startColor.g, startColor.b, 0);
+
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+            popup.rectTransform.anchoredPosition = Vector3.Lerp(startPosition, endPosition, t);
+            popup.color = Color.Lerp(startColor, endColor, t);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        Destroy(popup.gameObject);
     }
 
     private void SetScore(int score)

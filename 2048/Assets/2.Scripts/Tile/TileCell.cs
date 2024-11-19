@@ -6,6 +6,5 @@ public class TileCell : MonoBehaviour
     public Tile tile { get; set; }                  // 셀에 있는 타일
 
     public bool empty => tile == null;
-    public bool occupied => tile != null;
 
 }
