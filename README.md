@@ -24,3 +24,7 @@
   - ScorePopup UI
 - Build Test Complete
 </br>
+
+[2024-11-20]
+- 마무리
+</br>
