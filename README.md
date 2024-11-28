@@ -6,6 +6,16 @@
 <img src="https://github.com/user-attachments/assets/0fb15c14-b487-40f6-aeda-ca821a1c5ecc" width="250"></img>
 </br>
 
+## 1. 게임 메커니즘
+  - 플레이어가 타일을 상,하,좌,우로 움직이며 같은 숫자가 적힌 두 타일을 합쳐서 새로운 타일을 만들며 점수를 획득하는 게임
+## 2. 주요 목표
+  - 합칠때마다 점수를 획득하여 높은 점수를 기록
+  - "2048" 타일을 만드는 것
+## 3. 개발 환경
+  - Unity, C#
+</br>
+
+## 개발 일지
 [2024-11-18]
 - Project Setting
 - Add
