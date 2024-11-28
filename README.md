@@ -1,5 +1,4 @@
-# 2048 Game
-2048 게임
+# 2048 Game (2048)
 
 <img src="https://github.com/user-attachments/assets/2b441384-75b3-4573-bfa7-4f1e69de0125" width="250"></img>
 <img src="https://github.com/user-attachments/assets/785acccd-2ff3-463d-a451-9730e9d1f9f2" width="250"></img>
