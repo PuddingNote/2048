@@ -1,9 +1,9 @@
 # 2048 Game (2048)
 
-<img src="https://github.com/user-attachments/assets/2b441384-75b3-4573-bfa7-4f1e69de0125" width="250"></img>
-<img src="https://github.com/user-attachments/assets/785acccd-2ff3-463d-a451-9730e9d1f9f2" width="250"></img>
+<img src="https://github.com/user-attachments/assets/97bbda2f-bae8-48bb-bb2a-23b5b7ffbe9f" width="250"></img>
+<img src="https://github.com/user-attachments/assets/4cb3ed3c-8e5e-4f17-a7bb-1be81a15efd7" width="250"></img>
 <img src="https://github.com/user-attachments/assets/0fb15c14-b487-40f6-aeda-ca821a1c5ecc" width="250"></img>
-</br>
+
 
 ## 1. 게임 메커니즘
   - 플레이어가 타일을 상,하,좌,우로 움직이며 같은 숫자가 적힌 두 타일을 합쳐서 새로운 타일을 만들며 점수를 획득하는 게임
