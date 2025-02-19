@@ -2,35 +2,35 @@ using UnityEngine;
 
 public class TileGrid : MonoBehaviour
 {
-    public TileRow[] rows { get; private set; }
-    public TileCell[] cells { get; private set; }
+    public TileRow[] gridRows { get; private set; }
+    public TileCell[] gridCells { get; private set; }
 
-    public int size => cells.Length;        // 전체 셀 개수
-    public int height => rows.Length;       // 그리드 높이
-    public int width => size / height;      // 그리드 너비
+    public int totalCells => gridCells.Length;              // 전체 셀 개수
+    public int gridHeight => gridRows.Length;               // 그리드 높이
+    public int gridWidth => totalCells / gridHeight;        // 그리드 너비
 
     private void Awake()
     {
-        rows = GetComponentsInChildren<TileRow>();
-        cells = GetComponentsInChildren<TileCell>();
+        gridRows = GetComponentsInChildren<TileRow>();
+        gridCells = GetComponentsInChildren<TileCell>();
     }
 
     private void Start()
     {
-        for (int y = 0; y < rows.Length; y++)
+        for (int y = 0; y < gridRows.Length; y++)
         {
-            for (int x = 0; x < rows[y].cells.Length; x++)
+            for (int x = 0; x < gridRows[y].rowCells.Length; x++)
             {
-                rows[y].cells[x].coordinates = new Vector2Int(x, y);
+                gridRows[y].rowCells[x].gridPosition = new Vector2Int(x, y);
             }
         }
     }
 
     public TileCell GetCell(int x, int y)
     {
-        if (x >= 0 && x < width && y >= 0 && y < height)
+        if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight)
         {
-            return rows[y].cells[x];
+            return gridRows[y].rowCells[x];
         }
         else
         {
@@ -45,7 +45,7 @@ public class TileGrid : MonoBehaviour
 
     public TileCell GetAdjacentCell(TileCell cell, Vector2Int direction)
     {
-        Vector2Int coordinates = cell.coordinates;
+        Vector2Int coordinates = cell.gridPosition;
         coordinates.x += direction.x;
         coordinates.y -= direction.y;
 
@@ -54,14 +54,14 @@ public class TileGrid : MonoBehaviour
 
     public TileCell GetRandomEmptyCell()
     {
-        int index = Random.Range(0, cells.Length);
+        int index = Random.Range(0, gridCells.Length);
         int startingIndex = index;
 
-        while (!cells[index].empty)
+        while (!gridCells[index].isEmpty)
         {
             index++;
 
-            if (index >= cells.Length)
+            if (index >= gridCells.Length)
             {
                 index = 0;
             }
@@ -72,7 +72,7 @@ public class TileGrid : MonoBehaviour
             }
         }
 
-        return cells[index];
+        return gridCells[index];
     }
 
 }

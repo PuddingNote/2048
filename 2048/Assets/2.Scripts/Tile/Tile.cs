@@ -5,70 +5,73 @@ using TMPro;
 
 public class Tile : MonoBehaviour
 {
-    public TileState state { get; private set; }    // 타일의 시각적 상태
-    public TileCell cell { get; private set; }      // 타일이 위치한 셀
-    public int number { get; private set; }         // 타일의 숫자
-    public bool locked { get; set; }                // 한번의 입력에 여러개의 merge가 생기지 않게
+    public TileState tileState { get; private set; }    // 타일의 시각적 상태
+    public TileCell currentCell { get; private set; }   // 타일이 위치한 셀
+    public int tileNumber { get; private set; }         // 타일의 숫자
+    public bool isMergeLocked { get; set; }             // 한번의 입력에 여러개의 merge가 생기지 않게 확인
 
-    private Image background;                       // 배경이미지
-    private TextMeshProUGUI text;                   // 타일 숫자를 표시하는 텍스트
+    private Image backgroundImage;                      // 배경이미지
+    private TextMeshProUGUI tileNumberText;             // 타일 숫자를 표시하는 텍스트
 
     private void Awake()
     {
-        background = GetComponent<Image>();
-        text = GetComponentInChildren<TextMeshProUGUI>();
+        backgroundImage = GetComponent<Image>();
+        tileNumberText = GetComponentInChildren<TextMeshProUGUI>();
     }
 
+    // 타일 상태 설정
     public void SetState(TileState state, int number)
     {
-        this.state = state;
-        this.number = number;
+        this.tileState = state;
+        this.tileNumber = number;
 
-        background.color = state.backgroundColor;
-        text.color = state.textColor;
-        text.text = number.ToString();
+        backgroundImage.color = state.backgroundColor;
+        tileNumberText.color = state.textColor;
+        tileNumberText.text = number.ToString();
     }
 
-    public void Spawn(TileCell cell)
+    // 타일 스폰
+    public void SpawnTile(TileCell cell)
     {
-        if (this.cell != null)
+        if (this.currentCell != null)
         {
-            this.cell.tile = null;
+            this.currentCell.currentTile = null;
         }
 
-        this.cell = cell;
-        this.cell.tile = this;
+        this.currentCell = cell;
+        this.currentCell.currentTile = this;
 
         transform.position = cell.transform.position;
     }
 
-    public void MoveTo(TileCell cell)
+    // 타일 이동
+    public void MoveToCell(TileCell cell)
     {
-        if (this.cell != null)
+        if (this.currentCell != null)
         {
-            this.cell.tile = null;
+            this.currentCell.currentTile = null;
         }
 
-        this.cell = cell;
-        this.cell.tile = this;
+        this.currentCell = cell;
+        this.currentCell.currentTile = this;
 
-        StartCoroutine(Animate(cell.transform.position, false));
+        StartCoroutine(AnimateMovement(cell.transform.position, false));
     }
 
-    public void Merge(TileCell cell)
+    public void MergeWithCell(TileCell cell)
     {
-        if (this.cell != null)
+        if (this.currentCell != null)
         {
-            this.cell.tile = null;
+            this.currentCell.currentTile = null;
         }
 
-        this.cell = null;
-        cell.tile.locked = true;
+        this.currentCell = null;
+        cell.currentTile.isMergeLocked = true;
 
-        StartCoroutine(Animate(cell.transform.position, true));
+        StartCoroutine(AnimateMovement(cell.transform.position, true));
     }
 
-    private IEnumerator Animate(Vector3 to, bool merging)
+    private IEnumerator AnimateMovement(Vector3 to, bool isMerging)
     {
         float elapsed = 0f;
         float duration = 0.1f;
@@ -84,7 +87,7 @@ public class Tile : MonoBehaviour
 
         transform.position = to;
 
-        if (merging)
+        if (isMerging)
         {
             Destroy(gameObject);
         }

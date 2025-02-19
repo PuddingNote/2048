@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class TileRow : MonoBehaviour
 {
-    public TileCell[] cells { get; private set; }       // 青狼 葛电 伎
+    public TileCell[] rowCells { get; private set; }        // 青狼 葛电 伎
 
     private void Awake()
     {
-        cells = GetComponentsInChildren<TileCell>();
+        rowCells = GetComponentsInChildren<TileCell>();
     }
 
 }

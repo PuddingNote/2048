@@ -4,20 +4,20 @@ using UnityEngine;
 
 public class TileBoard : MonoBehaviour
 {
-    public GameManager gameManager;     // gameManager
+    public GameManager gameManager;
 
-    public Tile tilePrefabs;            // 생성한 타일 프리펩
-    public TileState[] tileStates;      // 타일 상태 배열
+    public Tile tilePrefab;                         // 생성한 타일 프리펩
+    public TileState[] availableTileStates;         // 타일 상태 배열
 
-    private TileGrid grid;              // 그리드
-    private List<Tile> tiles;           // 현재 존재하는 타일 목록
+    private TileGrid boardGrid;                     // 그리드
+    private List<Tile> activeTiles;                 // 현재 존재하는 타일 목록
 
-    private bool isMerging;             // Merge 애니메이션 확인 bool
+    private bool isMerging;                         // Merge 애니메이션 확인 bool
 
     private void Awake()
     {
-        grid = GetComponentInChildren<TileGrid>();
-        tiles = new List<Tile>(16);
+        boardGrid = GetComponentInChildren<TileGrid>();
+        activeTiles = new List<Tile>(16);
     }
 
     private void Update()
@@ -33,7 +33,7 @@ public class TileBoard : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
         {
-            MoveTiles(Vector2Int.down, 0, 1, grid.height - 2, -1);
+            MoveTiles(Vector2Int.down, 0, 1, boardGrid.gridHeight - 2, -1);
         }
         else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
@@ -41,7 +41,7 @@ public class TileBoard : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
         {
-            MoveTiles(Vector2Int.right, grid.width - 2, -1, 0, 1);
+            MoveTiles(Vector2Int.right, boardGrid.gridWidth - 2, -1, 0, 1);
         }
         
     }
@@ -49,26 +49,26 @@ public class TileBoard : MonoBehaviour
     // 보드 초기화
     public void ClearBoard()
     {
-        foreach (var cell in grid.cells)
+        foreach (var cell in boardGrid.gridCells)
         {
-            cell.tile = null;
+            cell.currentTile = null;
         }
 
-        foreach (var tile in tiles)
+        foreach (var tile in activeTiles)
         {
             Destroy(tile.gameObject);
         }
 
-        tiles.Clear();
+        activeTiles.Clear();
     }
 
     // 새로운 타일 생성
     public void CreateTile()
     {
-        Tile tile = Instantiate(tilePrefabs, grid.transform);
-        tile.SetState(tileStates[0], 2);
-        tile.Spawn(grid.GetRandomEmptyCell());
-        tiles.Add(tile);
+        Tile tile = Instantiate(tilePrefab, boardGrid.transform);
+        tile.SetState(availableTileStates[0], 2);
+        tile.SpawnTile(boardGrid.GetRandomEmptyCell());
+        activeTiles.Add(tile);
     }
 
     // 모든 타일 이동
@@ -76,15 +76,15 @@ public class TileBoard : MonoBehaviour
     {
         bool isChanged = false;
 
-        for (int x = startX; x >= 0 && x < grid.width; x += incrementX)
+        for (int x = startX; x >= 0 && x < boardGrid.gridWidth; x += incrementX)
         {
-            for (int y = startY; y >= 0 && y < grid.height; y += incrementY)
+            for (int y = startY; y >= 0 && y < boardGrid.gridHeight; y += incrementY)
             {
-                TileCell cell = grid.GetCell(x, y);
+                TileCell cell = boardGrid.GetCell(x, y);
 
-                if (!cell.empty)
+                if (!cell.isEmpty)
                 {
-                    isChanged |= MoveTile(cell.tile, direction);
+                    isChanged |= MoveTile(cell.currentTile, direction);
                 }
             }
         }
@@ -99,27 +99,27 @@ public class TileBoard : MonoBehaviour
     private bool MoveTile(Tile tile, Vector2Int direction)
     {
         TileCell newCell = null;
-        TileCell adjacent = grid.GetAdjacentCell(tile.cell, direction);
+        TileCell adjacent = boardGrid.GetAdjacentCell(tile.currentCell, direction);
 
         while (adjacent != null)
         {
-            if (!adjacent.empty)
+            if (!adjacent.isEmpty)
             {
-                if (CanMerge(tile, adjacent.tile))
+                if (CanMerge(tile, adjacent.currentTile))
                 {
-                    MergeTile(tile, adjacent.tile);
+                    MergeTile(tile, adjacent.currentTile);
                     return true;
                 }
                 break;
             }
 
             newCell = adjacent;
-            adjacent = grid.GetAdjacentCell(adjacent, direction);
+            adjacent = boardGrid.GetAdjacentCell(adjacent, direction);
         }
 
         if (newCell != null)
         {
-            tile.MoveTo(newCell);
+            tile.MoveToCell(newCell);
             return true;
         }
 
@@ -129,18 +129,18 @@ public class TileBoard : MonoBehaviour
     // a,b 타일을 합칠 수 있는지 확인
     private bool CanMerge(Tile a, Tile b)
     {
-        return a.number == b.number && !b.locked;
+        return a.tileNumber == b.tileNumber && !b.isMergeLocked;
     }
 
     private void MergeTile(Tile a, Tile b)
     {
-        tiles.Remove(a);
-        a.Merge(b.cell);
+        activeTiles.Remove(a);
+        a.MergeWithCell(b.currentCell);
 
-        int index = Mathf.Clamp(IndexOf(b.state) + 1, 0, tileStates.Length - 1);
-        int number = b.number * 2;
+        int index = Mathf.Clamp(IndexOf(b.tileState) + 1, 0, availableTileStates.Length - 1);
+        int number = b.tileNumber * 2;
 
-        b.SetState(tileStates[index], number);
+        b.SetState(availableTileStates[index], number);
 
         gameManager.AddScore(number);
     }
@@ -148,9 +148,9 @@ public class TileBoard : MonoBehaviour
     // 타일 상태의 인덱스 반환
     private int IndexOf(TileState state)
     {
-        for (int i = 0; i < tileStates.Length; i++)
+        for (int i = 0; i < availableTileStates.Length; i++)
         {
-            if (state == tileStates[i])
+            if (state == availableTileStates[i])
             {
                 return i;
             }
@@ -168,12 +168,12 @@ public class TileBoard : MonoBehaviour
 
         isMerging = false;
 
-        foreach (var tile in tiles)
+        foreach (var tile in activeTiles)
         {
-            tile.locked = false;
+            tile.isMergeLocked = false;
         }
 
-        if (tiles.Count != grid.size)
+        if (activeTiles.Count != boardGrid.totalCells)
         {
             CreateTile();
         }
@@ -186,34 +186,34 @@ public class TileBoard : MonoBehaviour
 
     private bool CheckForGameOver()
     {
-        if (tiles.Count != grid.size)
+        if (activeTiles.Count != boardGrid.totalCells)
         {
             return false;
         }
 
-        foreach (var tile in tiles)
+        foreach (var tile in activeTiles)
         {
-            TileCell up = grid.GetAdjacentCell(tile.cell, Vector2Int.up);
-            TileCell down = grid.GetAdjacentCell(tile.cell, Vector2Int.down);
-            TileCell left = grid.GetAdjacentCell(tile.cell, Vector2Int.left);
-            TileCell right = grid.GetAdjacentCell(tile.cell, Vector2Int.right);
+            TileCell up = boardGrid.GetAdjacentCell(tile.currentCell, Vector2Int.up);
+            TileCell down = boardGrid.GetAdjacentCell(tile.currentCell, Vector2Int.down);
+            TileCell left = boardGrid.GetAdjacentCell(tile.currentCell, Vector2Int.left);
+            TileCell right = boardGrid.GetAdjacentCell(tile.currentCell, Vector2Int.right);
 
-            if (up != null && CanMerge(tile, up.tile))
+            if (up != null && CanMerge(tile, up.currentTile))
             {
                 return false;
             }
 
-            if (down != null && CanMerge(tile, down.tile))
+            if (down != null && CanMerge(tile, down.currentTile))
             {
                 return false;
             }
 
-            if (left != null && CanMerge(tile, left.tile))
+            if (left != null && CanMerge(tile, left.currentTile))
             {
                 return false;
             }
 
-            if (right != null && CanMerge(tile, right.tile))
+            if (right != null && CanMerge(tile, right.currentTile))
             {
                 return false;
             }

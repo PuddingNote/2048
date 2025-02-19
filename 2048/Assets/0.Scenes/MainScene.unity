@@ -263,8 +263,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 145262738}
-  tilePrefabs: {fileID: 4308376365876479754, guid: fc9a5c1204651fd42905fa4671c1e410, type: 3}
-  tileStates:
+  tilePrefab: {fileID: 4308376365876479754, guid: fc9a5c1204651fd42905fa4671c1e410, type: 3}
+  availableTileStates:
   - {fileID: 11400000, guid: ad8e7a5a270c4c847843d762434c5c82, type: 2}
   - {fileID: 11400000, guid: 1e86b24572f654a41a99217e1a666082, type: 2}
   - {fileID: 11400000, guid: ef1921deea320ec40981b15d79af1e21, type: 2}
@@ -438,8 +438,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fe2eca7dba140f42907207b44f3d1c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  board: {fileID: 36127858}
-  gameOver: {fileID: 1477199506}
+  gameBoard: {fileID: 36127858}
+  gameOverCanvasGroup: {fileID: 1477199506}
   scoreText: {fileID: 1032512728}
   highScoreText: {fileID: 1203246898}
   scorePopupPrefab: {fileID: 2617589978856346448, guid: 7d8c80f612f9b29428506810f2cd7806, type: 3}
