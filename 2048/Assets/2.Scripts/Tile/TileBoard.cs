@@ -12,7 +12,7 @@ public class TileBoard : MonoBehaviour
     private TileGrid grid;              // 그리드
     private List<Tile> tiles;           // 현재 존재하는 타일 목록
 
-    private bool waiting;               // Merge 애니메이션 확인 bool
+    private bool isMerging;             // Merge 애니메이션 확인 bool
 
     private void Awake()
     {
@@ -22,27 +22,31 @@ public class TileBoard : MonoBehaviour
 
     private void Update()
     {
-        if (!waiting)
+        if (isMerging)
         {
-            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
-            {
-                MoveTiles(Vector2Int.up, 0, 1, 1, 1);
-            }
-            else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
-            {
-                MoveTiles(Vector2Int.down, 0, 1, grid.height - 2, -1);
-            }
-            else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                MoveTiles(Vector2Int.left, 1, 1, 0, 1);
-            }
-            else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                MoveTiles(Vector2Int.right, grid.width - 2, -1, 0, 1);
-            }
+            return;
         }
+
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            MoveTiles(Vector2Int.up, 0, 1, 1, 1);
+        }
+        else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            MoveTiles(Vector2Int.down, 0, 1, grid.height - 2, -1);
+        }
+        else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            MoveTiles(Vector2Int.left, 1, 1, 0, 1);
+        }
+        else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            MoveTiles(Vector2Int.right, grid.width - 2, -1, 0, 1);
+        }
+        
     }
 
+    // 보드 초기화
     public void ClearBoard()
     {
         foreach (var cell in grid.cells)
@@ -58,6 +62,7 @@ public class TileBoard : MonoBehaviour
         tiles.Clear();
     }
 
+    // 새로운 타일 생성
     public void CreateTile()
     {
         Tile tile = Instantiate(tilePrefabs, grid.transform);
@@ -69,7 +74,7 @@ public class TileBoard : MonoBehaviour
     // 모든 타일 이동
     private void MoveTiles(Vector2Int direction, int startX, int incrementX, int startY, int incrementY)
     {
-        bool changed = false;
+        bool isChanged = false;
 
         for (int x = startX; x >= 0 && x < grid.width; x += incrementX)
         {
@@ -79,12 +84,12 @@ public class TileBoard : MonoBehaviour
 
                 if (!cell.empty)
                 {
-                    changed |= MoveTile(cell.tile, direction);
+                    isChanged |= MoveTile(cell.tile, direction);
                 }
             }
         }
 
-        if (changed)
+        if (isChanged)
         {
             StartCoroutine(WaitForChanges());
         }
@@ -102,7 +107,7 @@ public class TileBoard : MonoBehaviour
             {
                 if (CanMerge(tile, adjacent.tile))
                 {
-                    Merge(tile, adjacent.tile);
+                    MergeTile(tile, adjacent.tile);
                     return true;
                 }
                 break;
@@ -121,12 +126,13 @@ public class TileBoard : MonoBehaviour
         return false;
     }
 
+    // a,b 타일을 합칠 수 있는지 확인
     private bool CanMerge(Tile a, Tile b)
     {
         return a.number == b.number && !b.locked;
     }
 
-    private void Merge(Tile a, Tile b)
+    private void MergeTile(Tile a, Tile b)
     {
         tiles.Remove(a);
         a.Merge(b.cell);
@@ -139,6 +145,7 @@ public class TileBoard : MonoBehaviour
         gameManager.AddScore(number);
     }
 
+    // 타일 상태의 인덱스 반환
     private int IndexOf(TileState state)
     {
         for (int i = 0; i < tileStates.Length; i++)
@@ -152,13 +159,14 @@ public class TileBoard : MonoBehaviour
         return -1;
     }
 
+    // 변경 사항 대기
     private IEnumerator WaitForChanges()
     {
-        waiting = true;
+        isMerging = true;
 
         yield return new WaitForSeconds(0.1f);
 
-        waiting = false;
+        isMerging = false;
 
         foreach (var tile in tiles)
         {
